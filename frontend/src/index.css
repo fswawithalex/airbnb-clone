@@ -1,0 +1,6 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand colour, usable as bg-brand / text-brand / border-brand */
+  --color-brand: #ff385c;
+}
