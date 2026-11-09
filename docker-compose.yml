@@ -67,7 +67,9 @@ services:
     image: node:24-alpine
     restart: unless-stopped
     working_dir: /app
-    command: sh -c "[ -f .env ] || cp .env.example .env; npm install && npm run dev"
+    # --host on the CLI (not only in vite.config.js) survives Vite's auto-restarts,
+    # e.g. when switching git branches briefly removes the config file.
+    command: sh -c "[ -f .env ] || cp .env.example .env; npm install && npm run dev -- --host 0.0.0.0"
     environment:
       VITE_USE_POLLING: ${VITE_USE_POLLING:-true}
     ports:
