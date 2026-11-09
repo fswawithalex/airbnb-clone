@@ -1,3 +1,6 @@
+# Local Docker overrides (copy from .env.example)
+/.env
+
 # Laravel
 /backend/.env
 /backend/.env.*
@@ -16,6 +19,7 @@
 # IDE / OS
 .idea/
 .vscode/
+*.swp
 .DS_Store
 Thumbs.db
 
