@@ -1,47 +1,44 @@
-import { useEffect, useState } from 'react'
-import api from '../lib/api.js'
+import { useEffect, useState } from 'react';
+import api from '../lib/api.js';
+import PropertyCard from '../components/PropertyCard.jsx';
 
-// Placeholder start page: proves the React app can reach the Laravel API and MySQL.
-// Replace with the real listings page.
 export default function Home() {
-  const [health, setHealth] = useState(null)
-  const [error, setError] = useState(null)
+  const [properties, setProperties] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     api
-      .get('/health')
-      .then((response) => setHealth(response.data))
-      .catch((err) => setError(err.response?.data ?? { message: err.message }))
-  }, [])
+      .get('/properties')
+      .then((response) => setProperties(response.data))
+      .catch((err) => setError(err.response?.data?.message ?? err.message))
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) {
+    return <div className="py-12 text-center text-gray-500">Загрузка жилья...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+        Ошибка загрузки квартир: {error}
+      </div>
+    );
+  }
 
   return (
-    <section className="max-w-xl">
-      <h1 className="text-3xl font-semibold">Development environment</h1>
-      <p className="mt-2 text-gray-600">React + Vite + Tailwind, talking to the Laravel API.</p>
+    <section>
+      <div className="mb-6 flex items-center justify-between">
+        <h1 className="text-2xl font-bold text-gray-900">Доступное жилье</h1>
+        <span className="text-sm text-gray-500">Найдено вариантов: {properties.length}</span>
+      </div>
 
-      <dl className="mt-8 divide-y divide-gray-200 rounded-xl border border-gray-200">
-        <StatusRow label="API" value={error ? 'unreachable' : health ? health.status : 'checking…'} ok={!error && health?.status === 'ok'} />
-        <StatusRow label="Database" value={error ? (error.database ?? 'unknown') : health ? health.database : 'checking…'} ok={!error && health?.database === 'connected'} />
-        <StatusRow label="API URL" value={api.defaults.baseURL} />
-      </dl>
-
-      {error && (
-        <p className="mt-4 rounded-lg bg-red-50 p-4 text-sm text-red-700">
-          Could not reach the API. Is <code>docker compose up</code> running? ({error.message ?? error.status})
-        </p>
-      )}
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        {properties.map((property) => (
+          <PropertyCard key={property.id} property={property} />
+        ))}
+      </div>
     </section>
-  )
-}
-
-function StatusRow({ label, value, ok }) {
-  return (
-    <div className="flex items-center justify-between px-4 py-3">
-      <dt className="text-gray-600">{label}</dt>
-      <dd className="flex items-center gap-2 font-medium">
-        {ok !== undefined && <span className={`h-2.5 w-2.5 rounded-full ${ok ? 'bg-green-500' : 'bg-gray-300'}`} />}
-        {value}
-      </dd>
-    </div>
-  )
+  );
 }
