@@ -16,25 +16,25 @@ export default function Home() {
   }, []);
 
   if (loading) {
-    return <div className="py-12 text-center text-gray-500">Загрузка жилья...</div>;
+    return <div className="py-16 text-center text-sm text-[#6A6A6A]">Загрузка жилья...</div>;
   }
 
   if (error) {
     return (
-      <div className="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+      <div className="rounded-xl bg-red-50 p-4 text-sm text-red-700">
         Ошибка загрузки квартир: {error}
       </div>
     );
   }
 
   return (
-    <section>
-      <div className="mb-6 flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-gray-900">Доступное жилье</h1>
-        <span className="text-sm text-gray-500">Найдено вариантов: {properties.length}</span>
-      </div>
+    <section className="py-4">
+      <h2 className="mb-4 text-lg font-semibold text-[#222222]">
+        Популярное жилье →
+      </h2>
 
-      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+      {/* Плотность сетки 1-в-1 как на новом Airbnb (до 7 карточек в ряд) */}
+      <div className="grid grid-cols-2 gap-x-4 gap-y-7 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 2xl:grid-cols-7">
         {properties.map((property) => (
           <PropertyCard key={property.id} property={property} />
         ))}
