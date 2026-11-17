@@ -54,6 +54,9 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    // React app URL, used in emails (password reset link) that must open a frontend page.
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
+
     // React app (separate container). Use for CORS and for links in emails, e.g. password reset.
     'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
 

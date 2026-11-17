@@ -31,7 +31,10 @@ erDiagram
 
     users {
         bigint id PK
-        string name
+        string name "display name = first + last"
+        string first_name "nullable (legal name)"
+        string last_name "nullable (legal name)"
+        date birth_date "nullable, 18+ at sign up"
         string email UK
         string password
         string phone "nullable"

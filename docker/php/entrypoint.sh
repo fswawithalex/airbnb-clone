@@ -16,4 +16,9 @@ if [ -f .env.example ] && [ ! -f .env ]; then
     php artisan key:generate --force
 fi
 
+# Make files on the "public" disk (avatars, listing photos) reachable at /storage/...
+if [ ! -e public/storage ]; then
+    php artisan storage:link || true
+fi
+
 exec "$@"

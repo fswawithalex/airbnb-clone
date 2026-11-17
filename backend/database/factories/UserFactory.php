@@ -23,8 +23,14 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $firstName = fake()->firstName();
+        $lastName = fake()->lastName();
+
         return [
-            'name' => fake()->name(),
+            'name' => "$firstName $lastName",
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'birth_date' => fake()->dateTimeBetween('-70 years', '-18 years')->format('Y-m-d'),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
@@ -33,6 +39,20 @@ class UserFactory extends Factory
             'role' => UserRole::Guest,
             'remember_token' => Str::random(10),
         ];
+    }
+
+    /**
+     * Keep first/last name in sync when a test or seeder passes only 'name' (e.g. 'Demo Host').
+     */
+    public function configure(): static
+    {
+        return $this->afterMaking(function (User $user) {
+            if ($user->name !== trim($user->first_name.' '.$user->last_name)) {
+                [$first, $last] = array_pad(preg_split('/\s+/', trim($user->name), 2), 2, null);
+                $user->first_name = $first;
+                $user->last_name = $last;
+            }
+        });
     }
 
     public function host(): static

@@ -9,6 +9,7 @@ Team project: a Laravel REST API + a React app, each in its own Docker container
 | Infrastructure | [`docker/`](docker), [`docker-compose.yml`](docker-compose.yml) | nginx, php-fpm, Node 24, phpMyAdmin, Mailpit |
 
 Database design, ERD and rules: **[docs/database.md](docs/database.md)**.
+Login, register, roles and user API (how to protect routes, `useAuth()`): **[docs/api-auth.md](docs/api-auth.md)**.
 
 ## Prerequisites
 
@@ -113,4 +114,5 @@ docker/php/         PHP-FPM image (Dockerfile, php.ini, entrypoint.sh)
 docker/nginx/       nginx config for the API
 docker/mysql/init/  SQL run once when the DB volume is created (creates the testing DB)
 docs/database.md    Database design and rules
+docs/api-auth.md    Auth & users API contract
 ```
