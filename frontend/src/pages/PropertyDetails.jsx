@@ -23,7 +23,7 @@ export default function PropertyDetails() {
   // Формируем 5 фото для фирменного коллажа Airbnb
   const photos = Array.from({ length: 5 }, (_, idx) => {
     const dbImg = property.images?.[idx]?.url;
-    return !dbImg || dbImg.includes('picsum.photos') ? LOCAL_PHOTOS[idx % LOCAL_PHOTOS.length] : dbImg;
+    return !dbImg || dbImg.includes('picsum.photos') ? LOCAL_PHOTOS[idx % LOCAL_PHOTOS.length] : dbImg; // improve this to be better, maybe add a checker if there are 4 photos then only should be shown only 4
   });
 
   return (
@@ -120,6 +120,9 @@ export default function PropertyDetails() {
 
             <div className="mt-5 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-center text-sm text-[#6A6A6A]">
               Календарь дат и выбор гостей (Разработчик 4)
+
+
+              
             </div>
 
             <button

@@ -112,7 +112,7 @@ class Property extends Model
      * on the property row, otherwise two requests can book the same dates at once.
      */
     #[Scope]
-    protected function availableBetween(Builder $query, DateTimeInterface|string $checkIn, DateTimeInterface|string $checkOut): void
+    protected function availableBetween(Builder $query, DateTimeInterface|string $checkIn, DateTimeInterface|string $checkOut, ?int $ignoredBookingId = null): void
     {
         // Compare plain dates: a time-of-day would make "check-out day = next check-in day" look like an overlap.
         $checkIn = Carbon::parse($checkIn)->toDateString();
@@ -121,6 +121,7 @@ class Property extends Model
         $query
             ->whereDoesntHave('bookings', fn (Builder $q) => $q
                 ->whereIn('status', BookingStatus::blocksDates())
+                ->when($ignoredBookingId !== null, fn (Builder $q) => $q->whereKeyNot($ignoredBookingId))
                 ->where('check_in', '<', $checkOut)
                 ->where('check_out', '>', $checkIn))
             ->whereDoesntHave('blockedDates', fn (Builder $q) => $q
