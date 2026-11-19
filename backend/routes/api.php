@@ -1,7 +1,10 @@
 <?php
 
+use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Api\Auth\AuthController;
+use App\Http\Controllers\Api\Auth\PasswordResetController;
+use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PropertyController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Api\BookingController;
@@ -24,9 +27,40 @@ use App\Http\Controllers\Api\BookingController;
 //     ], $ok ? 200 : 503);
 // });
 
-Route::get('/user', function (Request $request) {
-    return $request->user();
-})->middleware('auth:sanctum');
+/*
+| Module 1: authentication & users. Contract: docs/api-auth.md
+| Auth = "Authorization: Bearer <token>" (Sanctum personal access tokens).
+*/
+Route::prefix('auth')->group(function () {
+    Route::post('/check-email', [AuthController::class, 'checkEmail'])->middleware('throttle:20,1');
+    Route::middleware('throttle:6,1')->group(function () {
+        Route::post('/register', [AuthController::class, 'register']);
+        Route::post('/login', [AuthController::class, 'login']);
+        Route::post('/forgot-password', [PasswordResetController::class, 'sendLink']);
+    });
+    Route::post('/reset-password', [PasswordResetController::class, 'reset'])->middleware('throttle:10,1');
+    Route::post('/logout', [AuthController::class, 'logout'])->middleware('auth:sanctum');
+});
+
+Route::middleware('auth:sanctum')->prefix('user')->group(function () {
+    Route::get('/', [ProfileController::class, 'show']);
+    Route::put('/profile', [ProfileController::class, 'update']);
+    Route::post('/avatar', [ProfileController::class, 'updateAvatar']);
+    Route::delete('/avatar', [ProfileController::class, 'destroyAvatar']);
+    Route::put('/password', [ProfileController::class, 'updatePassword']);
+    Route::post('/become-host', [ProfileController::class, 'becomeHost']);
+    Route::delete('/', [ProfileController::class, 'destroy']);
+});
+
+Route::get('/users/{user}', [ProfileController::class, 'publicProfile'])->whereNumber('user');
+
+Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin/users')->group(function () {
+    Route::get('/', [AdminUserController::class, 'index']);
+    Route::get('/{user}', [AdminUserController::class, 'show'])->withTrashed();
+    Route::put('/{user}/role', [AdminUserController::class, 'updateRole'])->withTrashed();
+    Route::delete('/{user}', [AdminUserController::class, 'destroy'])->withTrashed();
+    Route::post('/{user}/restore', [AdminUserController::class, 'restore'])->withTrashed();
+});
 
 Route::get('/properties', [PropertyController::class, 'index']);
 Route::get('/properties/{properties}', [PropertyController::class, 'show']);
