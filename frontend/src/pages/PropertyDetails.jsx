@@ -2,12 +2,18 @@ import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router';
 import api from '../lib/api.js';
 
+import DateRangePicker from '../components/booking/DateRangePicker.jsx';
+import GuestSelector from '../components/booking/GuestSelector.jsx';
+
 const LOCAL_PHOTOS = ['/1.jpg', '/2.jpg', '/3.jpg', '/4.jpg', '/5.jpg'];
 
 export default function PropertyDetails() {
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [checkIn, setCheckIn] = useState('');
+  const [checkOut, setCheckOut] = useState('');
+  const [guests, setGuests] = useState(1);
 
   useEffect(() => {
     api
@@ -119,10 +125,18 @@ export default function PropertyDetails() {
             </div>
 
             <div className="mt-5 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-center text-sm text-[#6A6A6A]">
-              Календарь дат и выбор гостей (Разработчик 4)
+              <DateRangePicker
+                checkIn={checkIn}
+                checkOut={checkOut}
+                onCheckInChange={setCheckIn}
+                onCheckOutChange={setCheckOut}
+              />
 
-
-              
+              <GuestSelector
+                guests={guests}
+                maxGuests={Number(property.max_guests)}
+                onChange={setGuests}
+              />
             </div>
 
             <button

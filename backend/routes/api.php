@@ -29,21 +29,26 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:sanctum');
 
 Route::get('/properties', [PropertyController::class, 'index']);
-Route::get('/properties/{property}', [PropertyController::class, 'show']);
+Route::get('/properties/{properties}', [PropertyController::class, 'show']);
+Route::get('/properties/{property}/availability', [BookingController::class, 'availability']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/properties', [PropertyController::class, 'store']);
     Route::put('/properties/{property}', [PropertyController::class, 'update']);
     Route::delete('/properties/{property}', [PropertyController::class, 'destroy']);
-
 });
 
-Route::middleware(['auth:sanctum', 'role:guest,admin'])->group(function () {
+Route::middleware(['auth:sanctum', 'role:guest'])->group(function () {
     // Sanctum is used when authenticated; otherwise the configured test user is
     // available only in local development. Non-local unauthenticated calls return 401.
     Route::post('/bookings', [BookingController::class, 'store']);
     Route::get('/bookings', [BookingController::class, 'index']);
+    Route::post('/bookings/{booking}/cancel',[BookingController::class, 'cancel'] );
+});
 
+Route::middleware(['auth:sanctum', 'role:host'])->group(function () {
+    Route::get('/bookings/show', [BookingController::class, 'show']);
     Route::post('/bookings/{booking}/approve', [BookingController::class, 'approve']);
     Route::post('/bookings/{booking}/reject', [BookingController::class, 'reject']);
 });
+

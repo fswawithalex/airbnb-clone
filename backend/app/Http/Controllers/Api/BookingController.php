@@ -46,10 +46,9 @@ class BookingController extends Controller
      */
     public function store(StoreBookingRequest $request)
     {
-        $guest = $this->bookingGuest($request);
         $data = $request->validated();
 
-        $booking = DB::transaction(function () use ($data, $guest) {
+        $booking = DB::transaction(function () use ($data, $request) {
             $property = Property::query()
                 ->whereKey($data['property_id'])
                 ->lockForUpdate()
@@ -61,7 +60,7 @@ class BookingController extends Controller
                 ]);
             }
 
-            if ((int) $property->host_id === (int) $guest->id) {
+            if ((int) $property->host_id === (int) $request->user()->id) {
                 throw ValidationException::withMessages([
                     'property_id' => 'BE.ERROR_BOOKING_HOST_NOT_BOOK_OWN_PROPERTY'
                 ]);
@@ -73,12 +72,12 @@ class BookingController extends Controller
                 ]);
             }
 
-            $avaiable = Property::query()
+            $available = Property::query()
                 ->availableBetween($data['check_in'], $data['check_out'])
                 ->whereKey($property->id)
                 ->exists();
 
-            if (!$avaiable) {
+            if (!$available) {
                 throw ValidationException::withMessages([
                     'dates' => 'BE.ERROR_BOOKING_PROPERTY_NOT_AVAILABLE_FOR_DATES'
                 ]);
@@ -96,7 +95,7 @@ class BookingController extends Controller
 
             $booking = Booking::create([
                 'property_id' => $property->id,
-                'guest_id' => $guest->id,
+                'guest_id' => $request->user()->id,
                 'check_in' => $data['check_in'],
                 'check_out' => $data['check_out'],
                 'guests' => $data['guests'],
@@ -120,10 +119,59 @@ class BookingController extends Controller
         ], 201);
     }
 
+    // FUNCTIONS for GUESTs
     public function index(Request $request)
     {
+        abort_unless($request->user(), 401);
+
         $bookings = Booking::query()
-            ->where('guest_id', $request->user()->id ?? $request['user_id'])
+            ->where('guest_id', $request->user()->id)
+            ->with(['property.primaryImage', 'payments'])
+            ->latest()
+            ->paginate(16);
+
+        return response()->json($bookings);
+    }
+
+    public function cancel(Request $request, Booking $booking)
+    {
+        abort_unless($request->user(), 401);
+
+        $cancelledBooking = DB::transaction(function () use ($booking, $request) {
+            $booking = Booking::query()
+                ->whereKey($booking->id)
+                ->where('guest_id', $request->user()->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($booking->status !== BookingStatus::Confirmed) {
+                throw ValidationException::withMessages([
+                    'booking' => 'BE.ERROR_BOOKING_STATUS_NOT_FOR_CANCELATION'
+                ]);
+            }
+
+            $booking->update([
+                'status' => BookingStatus::Cancelled
+            ]);
+
+            return $booking->fresh([
+                'property.primaryImage'
+            ]);
+        });
+
+        return response()->json([
+            'message' => 'Booking cancelled',
+            'booking' => $cancelledBooking
+        ]);
+    }
+
+    // FUNCTIONS for HOSTs
+    public function show(Request $request)
+    {
+        abort_unless($request->user(), 401);
+
+        $bookings = Booking::query()
+            ->where('host_id', $request->user()->id)
             ->with(['property.primaryImage', 'payments'])
             ->latest()
             ->paginate(16);
@@ -133,10 +181,9 @@ class BookingController extends Controller
 
     public function approve(Request $request, Booking $booking)
     {
-        // abort_unless($request->user(), 401);
-        $host = $this->bookingHost($request);
+        abort_unless($request->user(), 401);
 
-        $confirmedBooking = DB::transaction(function () use ($request, $booking, $host){
+        $confirmedBooking = DB::transaction(function () use ($request, $booking){
             // Lock the property first. This serializes approval attempts
             // for bookings belonging to the same property.
             $property = Property::query()
@@ -145,8 +192,7 @@ class BookingController extends Controller
             ->firstOrFail();
 
             abort_unless(
-                // (int) $property->host_id === (int) $request->user()->id,
-                (int) $property->host_id === (int) $host->id,
+                (int) $property->host_id === (int) $request->user()->id,
                 403,
                 'BE.ERROR_BOOKING_NOT_HOST'
             );
@@ -162,8 +208,8 @@ class BookingController extends Controller
                 ]);
             }
 
-            $avaiable = Property::query()
-                ->AvailableBetween(
+            $available = Property::query()
+                ->availableBetween(
                     $booking->check_in,
                     $booking->check_out,
                     $booking->id
@@ -171,9 +217,9 @@ class BookingController extends Controller
                 ->whereKey($property->id)
                 ->exists();
 
-            if (!$avaiable) {
+            if (!$available) {
                 throw ValidationException::withMessages([
-                    'dates' => 'BE.ERROR_BOOKING_DATES_NOT_AVAIABLE'
+                    'dates' => 'BE.ERROR_BOOKING_DATES_NOT_AVAILABLE'
                 ]);
             }
 
@@ -194,18 +240,16 @@ class BookingController extends Controller
     }
 
     public function reject(Request $request, Booking $booking) {
-        // abort_unless($request->user(), 401); - uncomment this when the auth is added
-        $host = $this->bookingHost($request);
+        abort_unless($request->user(), 401);
 
-        $rejectedBooking = DB::transaction(function () use ($request, $booking, $host) {
+        $rejectedBooking = DB::transaction(function () use ($request, $booking) {
             $property = Property::query()
                 ->whereKey($booking->property_id)
                 ->lockForUpdate()
                 ->firstOrFail();
 
             abort_unless(
-                // (int) $property->host_id === (int) $request->user()->id,
-                (int) $property->host_id === (int) $host->id,
+                (int) $property->host_id === (int) $request->user()->id,
                 403,
                 'BE.ERROR_BOOKING_NOT_HOST'
             );
@@ -235,61 +279,5 @@ class BookingController extends Controller
             'message' => 'Booking rejected',
             'booking' => $rejectedBooking
         ]);
-    }
-
-
-
-//comment this when auth is implementend
-    private function bookingGuest(Request $request): User
-    {
-        if ($request->user() instanceof User){
-            return $request->user();
-        }
-
-        abort_unless(app()->environment('local'), 401, 'Unathenticated.');
-
-        $testUserId = config('bookings.test_user_id');
-
-        abort_if(
-            !is_numeric($testUserId) || (int) $testUserId < 1,
-            500,
-            'Set a BOOKING_TEST_USER_ID to an existing local user ID.'
-        );
-
-        $guest = User::query()->find((int) $testUserId);
-
-        abort_if(
-            !$guest,
-            500,
-            'Something went wrong with the BOOKING_TEST_USER_ID, didnt match to an existing user'
-        );
-
-        return $guest;
-    }
-
-    private function bookingHost(Request $request): User
-    {
-        if ($request->user() instanceof User){
-            return $request->user();
-        }
-
-        abort_unless(
-            app()->environment('local'),
-            401
-        );
-
-        $testHostId = config('bookings.test_host_id');
-
-        abort_if(
-            !is_numeric($testHostId) || (int) $testHostId < 1,
-            500,
-            'Set a BOOKING_TEST_HOST_ID.'
-        );
-
-        $host = User::find((int) $testHostId);
-
-        abort_if(!$host, 500, 'Test host was not found');
-
-        return $host;
     }
 }
