@@ -38,10 +38,12 @@ Route::middleware('auth:sanctum')->group(function () {
 
 });
 
-// Sanctum is used when authenticated; otherwise the configured test user is
-// available only in local development. Non-local unauthenticated calls return 401.
-Route::post('/bookings', [BookingController::class, 'store']);
-Route::get('/bookings', [BookingController::class, 'index']);
+Route::middleware(['auth:sanctum', 'role:guest,admin'])->group(function () {
+    // Sanctum is used when authenticated; otherwise the configured test user is
+    // available only in local development. Non-local unauthenticated calls return 401.
+    Route::post('/bookings', [BookingController::class, 'store']);
+    Route::get('/bookings', [BookingController::class, 'index']);
 
-Route::post('/bookings/{booking}/approve', [BookingController::class, 'approve']);
-Route::post('/bookings/{booking}/reject', [BookingController::class, 'reject']);
+    Route::post('/bookings/{booking}/approve', [BookingController::class, 'approve']);
+    Route::post('/bookings/{booking}/reject', [BookingController::class, 'reject']);
+});
