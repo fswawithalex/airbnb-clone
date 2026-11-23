@@ -19,6 +19,9 @@ import BecomeHost from './pages/account/BecomeHost.jsx'
 import PublicProfile from './pages/users/PublicProfile.jsx'
 import AdminUsers from './pages/admin/Users.jsx'
 import './index.css'
+import Trips from './pages/account/Trips.jsx'
+import BookingPage from './pages/account/BookingPage.jsx'
+import HostReservations from './pages/host/Reservations.jsx'
 
 const router = createBrowserRouter([
   {
@@ -52,7 +55,17 @@ const router = createBrowserRouter([
           { path: 'account-settings/login-and-security', element: <LoginSecurity /> },
           { path: 'account-settings/preferences', element: <Preferences /> },
           { path: 'profile', element: <Navigate to="/account-settings" replace /> },
+          { path: 'trips', element: <Trips /> },
+          { path: 'trips/:id', element: <BookingPage /> },
+          { path: 'bookings', element: <Navigate to="/trips" replace /> },
+          { path: 'booking/:id', element: <BookingPage /> },
         ],
+      },
+
+      // Hosts & admins
+      {
+        element: <ProtectedRoute roles={['host', 'admin']} />,
+        children: [{ path: 'host/reservations', element: <HostReservations /> }],
       },
 
       // Admins only

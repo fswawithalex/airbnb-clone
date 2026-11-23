@@ -1,58 +1,30 @@
-export default function GuestSelector({
-    guests,
-    maxGuests,
-    onChange
-}) {
-    const updateGuests = (amount) => {
-        const nextValue = guests + amount;
+import { useI18n } from '../../i18n/I18nContext.jsx'
 
-        if (nextValue < 1 || nextValue > maxGuests) {
-            return;
-        }
+export default function GuestSelector({ guests, maxGuests, onChange }) {
+  const { t } = useI18n()
 
-        onChange(nextValue);
-    };
+  const update = (amount) => {
+    const next = guests + amount
+    if (next >= 1 && next <= maxGuests) onChange(next)
+  }
 
-    return (
-        <div className="mt-5">
-            <label className="mb-3 block text-sm font-medium">
-                Guests
-            </label>
+  const stepButton = 'flex h-8 w-8 items-center justify-center rounded-full border border-[#B0B0B0] text-lg leading-none text-[#6A6A6A] hover:border-[#222222] hover:text-[#222222] disabled:cursor-not-allowed disabled:opacity-30'
 
-            <div className="flex items-center justify-between rounded-lg border border-gray-300 p-3">
-
-                <div>
-                    <p>Guests</p>
-                    <p className="text-sm text-gray-500">
-                        Maximum {maxGuests} guests
-                    </p>
-                </div>
-
-                <div className="flex items-center gap-4">
-
-                    <button 
-                        type="button"
-                        onClick={() => updateGuests(-1)}
-                        disabled={guests <= 1}
-                        className="h-8 w-8 rounded-full border disabled:opacity-30"
-                    >
-                        -
-                    </button>
-
-                    <span className="min-w-4 text-center">
-                        {guests}
-                    </span>
-
-                    <button
-                        type="button"
-                        onClick={() => updateGuests(1)}
-                        disabled={guests >= maxGuests}
-                        className="h-8 w-8 rounded-full border disabled:opacity-30"
-                    >
-                        +
-                    </button>
-                </div>
-            </div>
-        </div>
-    );
+  return (
+    <div className="mt-3 flex items-center justify-between rounded-lg border border-[#B0B0B0] px-3 py-2">
+      <div className="text-left">
+        <span className="block text-[10px] font-bold uppercase tracking-wide">{t('booking.guests')}</span>
+        <span className="block text-xs text-[#6A6A6A]">{t('booking.maxGuests', { count: maxGuests })}</span>
+      </div>
+      <div className="flex items-center gap-3">
+        <button type="button" onClick={() => update(-1)} disabled={guests <= 1} className={stepButton} aria-label={t('booking.fewerGuests')}>
+          −
+        </button>
+        <span className="min-w-4 text-center text-sm">{guests}</span>
+        <button type="button" onClick={() => update(1)} disabled={guests >= maxGuests} className={stepButton} aria-label={t('booking.moreGuests')}>
+          +
+        </button>
+      </div>
+    </div>
+  )
 }

@@ -1,63 +1,59 @@
-import { todayISO } from '../../lib/dates.js';
+import { useI18n } from '../../i18n/I18nContext.jsx'
+import { addDays, formatDay } from '../../lib/booking.js'
+import { todayISO } from '../../lib/dates.js'
 
-export default function DateRangePicker({
-    checkIn,
-    checkOut,
-    onCheckInChange,
-    onCheckOutChange
-}) {
-    const getNextDay = (date) => {
-        const next = new Date(`${date}T00:00:00`);
-        next.setDate(next.getDate() + 1);
+/**
+ * Check-in / check-out inputs. Native date inputs can't grey out single days,
+ * so taken ranges are listed under the inputs and the parent validates overlaps.
+ */
+export default function DateRangePicker({ checkIn, checkOut, onCheckInChange, onCheckOutChange, unavailable = [] }) {
+  const { t, locale } = useI18n()
+  const minCheckOut = addDays(checkIn || todayISO(), 1)
 
-        return [
-            next.getFullYear(),
-            String(next.getMonth() + 1).padStart(2, '0'),
-            String(next.getDate()).padStart(2, '0')
-        ].join('-');
-    };
+  const handleCheckInChange = (value) => {
+    onCheckInChange(value)
+    // Reset checkout if it is no longer valid
+    if (checkOut && checkOut <= value) onCheckOutChange('')
+  }
 
-    const minCheckOut = checkIn ? getNextDay(checkIn) : getNextDay(todayISO());
+  return (
+    <div>
+      <div className="grid grid-cols-2 overflow-hidden rounded-lg border border-[#B0B0B0]">
+        <label className="block border-r border-[#B0B0B0] px-3 py-2">
+          <span className="block text-[10px] font-bold uppercase tracking-wide">{t('booking.checkIn')}</span>
+          <input
+            type="date"
+            min={todayISO()}
+            value={checkIn}
+            onChange={(e) => handleCheckInChange(e.target.value)}
+            className="w-full bg-transparent text-sm outline-none"
+          />
+        </label>
+        <label className="block px-3 py-2">
+          <span className="block text-[10px] font-bold uppercase tracking-wide">{t('booking.checkOut')}</span>
+          <input
+            type="date"
+            min={minCheckOut}
+            value={checkOut}
+            disabled={!checkIn}
+            onChange={(e) => onCheckOutChange(e.target.value)}
+            className="w-full bg-transparent text-sm outline-none disabled:text-[#B0B0B0]"
+          />
+        </label>
+      </div>
 
-    const handleCheckInChange = (value) => {
-        onCheckInChange(value);
-
-        // Reset checkout if it is no longer valid
-        if (checkOut && checkOut <= value) {
-            onCheckOutChange('');
-        }
-    };
-
-    return (
-        <div className="grid grid-cols-2 gap-3">
-            <div>
-                <label className="mb-2 block text-sm font-medium">
-                    Check-in
-                </label>
-
-                <input 
-                    type="date"
-                    min={todayISO()}
-                    value={checkIn}
-                    onChange={(e) => handleCheckInChange(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 p-3 text-sm"
-                />
-            </div>
-
-            <div>
-                <label className="mb-2 block text-sm font-medium">
-                    Check-out
-                </label>
-
-                <input 
-                    type="date"
-                    min={minCheckOut}
-                    value={checkOut}
-                    disabled={!checkOut}
-                    onChange={(e) => onCheckOutChange(e.target.value)}
-                    className="w-full rounded-lg border border-gray-300 p-3 text-sm disabled:bg-gray-100"
-                />
-            </div>
-        </div>
-    );
+      {unavailable.length > 0 && (
+        <details className="mt-2 text-left text-xs text-[#6A6A6A]">
+          <summary className="cursor-pointer select-none underline">{t('booking.unavailableDates', { count: unavailable.length })}</summary>
+          <ul className="mt-1 space-y-0.5 pl-4">
+            {unavailable.map((range) => (
+              <li key={`${range.start}-${range.end}`} className="list-disc">
+                {formatDay(range.start, locale)} → {formatDay(range.end, locale)}
+              </li>
+            ))}
+          </ul>
+        </details>
+      )}
+    </div>
+  )
 }
