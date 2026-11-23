@@ -10,7 +10,7 @@ import Avatar from './Avatar.jsx'
  * Wishlists / Trips / Messages point to the routes of the other modules (/wishlists, /trips, /messages).
  */
 export default function UserMenu({ onOpenLanguage }) {
-  const { user, isAdmin, logout } = useAuth()
+  const { user, isHost, isAdmin, logout } = useAuth()
   const { openAuthModal } = useAuthModal()
   const { t } = useI18n()
   const [open, setOpen] = useState(false)
@@ -69,11 +69,16 @@ export default function UserMenu({ onOpenLanguage }) {
         >
           {user ? (
             <>
-              <Link to="/wishlists" role="menuitem" className={`${item} font-semibold`}>
-                {t('menu.wishlists')}
-              </Link>
               <Link to="/trips" role="menuitem" className={`${item} font-semibold`}>
                 {t('menu.trips')}
+              </Link>
+              {isHost && (
+                <Link to="/host/reservations" role="menuitem" className={`${item} font-semibold`}>
+                  {t('menu.reservations')}
+                </Link>
+              )}
+              <Link to="/wishlists" role="menuitem" className={`${item} font-semibold`}>
+                {t('menu.wishlists')}
               </Link>
               <Link to="/messages" role="menuitem" className={`${item} font-semibold`}>
                 {t('menu.messages')}

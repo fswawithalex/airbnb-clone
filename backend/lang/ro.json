@@ -18,5 +18,19 @@
     "Hello!": "Salut!",
     "Regards,": "Cu drag,",
     "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "Dacă butonul „:actionText” nu funcționează, copiază și lipește linkul de mai jos\nîn browser:",
-    "All rights reserved.": "Toate drepturile rezervate."
+    "All rights reserved.": "Toate drepturile rezervate.",
+    "This listing is not available for booking.": "Această locuință nu este disponibilă pentru rezervare.",
+    "You cannot book your own listing.": "Nu îți poți rezerva propria locuință.",
+    "This listing accommodates up to :count guests.": "Această locuință poate găzdui cel mult :count oaspeți.",
+    "These dates are no longer available.": "Aceste date nu mai sunt disponibile.",
+    "Reservation request sent to the host.": "Cererea de rezervare a fost trimisă gazdei.",
+    "This reservation can no longer be cancelled.": "Această rezervare nu mai poate fi anulată.",
+    "Reservation cancelled.": "Rezervarea a fost anulată.",
+    "You can pay once the host confirms your reservation.": "Poți plăti după ce gazda îți confirmă rezervarea.",
+    "This reservation is already paid.": "Această rezervare este deja plătită.",
+    "Payment successful.": "Plata a fost efectuată cu succes.",
+    "Only pending requests can be accepted.": "Doar cererile în așteptare pot fi acceptate.",
+    "Only pending requests can be declined.": "Doar cererile în așteptare pot fi refuzate.",
+    "Reservation accepted.": "Rezervarea a fost acceptată.",
+    "Reservation declined.": "Rezervarea a fost refuzată."
 }

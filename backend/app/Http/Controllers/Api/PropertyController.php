@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Property;
 use Illuminate\Http\Request;
-
+use App\Enums\PropertyStatus;
 class PropertyController extends Controller
 {
     // 1. Получить все опубликованные квартиры (для витрины)

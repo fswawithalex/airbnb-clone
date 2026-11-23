@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router';
+import { useParams } from 'react-router';
 import api from '../lib/api.js';
 
-import DateRangePicker from '../components/booking/DateRangePicker.jsx';
-import GuestSelector from '../components/booking/GuestSelector.jsx';
+import BookingCard from '../components/booking/BookingCard.jsx';
 
 const LOCAL_PHOTOS = ['/1.jpg', '/2.jpg', '/3.jpg', '/4.jpg', '/5.jpg'];
 
@@ -11,9 +10,6 @@ export default function PropertyDetails() {
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [checkIn, setCheckIn] = useState('');
-  const [checkOut, setCheckOut] = useState('');
-  const [guests, setGuests] = useState(1);
 
   useEffect(() => {
     api
@@ -23,10 +19,10 @@ export default function PropertyDetails() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div className="py-16 text-center text-sm text-[#6A6A6A]">Загрузка...</div>;
-  if (!property) return <div className="py-16 text-center text-sm text-red-500">Жилье не найдено</div>;
+  if (loading) return <div className="py-16 text-center text-sm text-[#6A6A6A]">Loading...</div>;
+  if (!property) return <div className="py-16 text-center text-sm text-red-500">Nothing was found</div>;
 
-  // Формируем 5 фото для фирменного коллажа Airbnb
+  // Формируем 5 фото для фирменного коллажа Airbnb -> recheck this please
   const photos = Array.from({ length: 5 }, (_, idx) => {
     const dbImg = property.images?.[idx]?.url;
     return !dbImg || dbImg.includes('picsum.photos') ? LOCAL_PHOTOS[idx % LOCAL_PHOTOS.length] : dbImg; // improve this to be better, maybe add a checker if there are 4 photos then only should be shown only 4
@@ -50,7 +46,7 @@ export default function PropertyDetails() {
       </div>
 
       {/* Фирменный коллаж из 5 фото (1 большое слева + 4 справа) */}
-      <div className="mt-6 grid grid-cols-1 gap-2 overflow-hidden rounded-2xl md:h-[400px] md:grid-cols-4 md:grid-rows-2">
+      <div className="mt-6 grid grid-cols-1 gap-2 overflow-hidden rounded-2xl md:h-100 md:grid-cols-4 md:grid-rows-2">
                 <div className="md:col-span-2 md:row-span-2">
           <img
             src={photos[0]}
@@ -111,42 +107,9 @@ export default function PropertyDetails() {
           )}
         </div>
 
-        {/* Липкая карточка бронирования (место для Разработчика 4) */}
+        {/* Липкая карточка бронирования */}
         <div>
-          <div className="sticky top-24 rounded-xl border border-gray-200 bg-white p-6 shadow-xl">
-            <div className="flex items-baseline justify-between">
-              <div>
-                <span className="text-[22px] font-semibold">
-                  ${Number(property.price_per_night).toFixed(0)}
-                </span>{' '}
-                <span className="text-base text-[#222222]">ночь</span>
-              </div>
-              <span className="text-sm font-semibold">★ 4,95</span>
-            </div>
-
-            <div className="mt-5 rounded-lg border border-dashed border-gray-300 bg-gray-50 p-4 text-center text-sm text-[#6A6A6A]">
-              <DateRangePicker
-                checkIn={checkIn}
-                checkOut={checkOut}
-                onCheckInChange={setCheckIn}
-                onCheckOutChange={setCheckOut}
-              />
-
-              <GuestSelector
-                guests={guests}
-                maxGuests={Number(property.max_guests)}
-                onChange={setGuests}
-              />
-            </div>
-
-            <button
-              type="button"
-              disabled
-              className="mt-4 w-full cursor-not-allowed rounded-lg bg-[#FF385C] py-3.5 text-base font-semibold text-white"
-            >
-              Забронировать
-            </button>
-          </div>
+          <BookingCard property={property} />
         </div>
       </div>
     </div>

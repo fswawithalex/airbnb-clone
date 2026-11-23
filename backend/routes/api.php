@@ -3,11 +3,12 @@
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordResetController;
+use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\Api\HostReservationController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PropertyController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Api\BookingController;
 
 // Used by the frontend start page and by `docker compose` checks: is the API up and can it reach MySQL?
 // Route::get('/health', function () {
@@ -63,8 +64,9 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin/users')->group(
 });
 
 Route::get('/properties', [PropertyController::class, 'index']);
-Route::get('/properties/{properties}', [PropertyController::class, 'show']);
-Route::get('/properties/{property}/availability', [BookingController::class, 'availability']);
+Route::get('/properties/{property}', [PropertyController::class, 'show'])->whereNumber('property');
+Route::get('/properties/{property}/availability', [BookingController::class, 'availability'])->whereNumber('property');
+Route::get('/properties/{property}/unavailable-dates', [BookingController::class, 'unavailableDates'])->whereNumber('property');
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::post('/properties', [PropertyController::class, 'store']);
@@ -72,17 +74,22 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/properties/{property}', [PropertyController::class, 'destroy']);
 });
 
-Route::middleware(['auth:sanctum', 'role:guest'])->group(function () {
-    // Sanctum is used when authenticated; otherwise the configured test user is
-    // available only in local development. Non-local unauthenticated calls return 401.
-    Route::post('/bookings', [BookingController::class, 'store']);
-    Route::get('/bookings', [BookingController::class, 'index']);
-    Route::post('/bookings/{booking}/cancel',[BookingController::class, 'cancel'] );
+/*
+| Module 3: bookings & reservations. Contract: docs/api-bookings.md
+| Guest side: any logged-in user can book (hosts too, just not their own listings).
+*/
+Route::middleware('auth:sanctum')->prefix('bookings')->group(function () {
+    Route::get('/', [BookingController::class, 'index']);
+    Route::post('/', [BookingController::class, 'store'])->middleware('throttle:20,1');
+    Route::get('/{booking}', [BookingController::class, 'show'])->whereNumber('booking');
+    Route::post('/{booking}/cancel', [BookingController::class, 'cancel'])->whereNumber('booking');
+    Route::post('/{booking}/pay', [BookingController::class, 'pay'])->whereNumber('booking');
 });
 
-Route::middleware(['auth:sanctum', 'role:host'])->group(function () {
-    Route::get('/bookings/show', [BookingController::class, 'show']);
-    Route::post('/bookings/{booking}/approve', [BookingController::class, 'approve']);
-    Route::post('/bookings/{booking}/reject', [BookingController::class, 'reject']);
+// Host side: requests on the listings I host
+Route::middleware(['auth:sanctum', 'role:host,admin'])->prefix('host/reservations')->group(function () {
+    Route::get('/', [HostReservationController::class, 'index']);
+    Route::post('/{booking}/approve', [HostReservationController::class, 'approve'])->whereNumber('booking');
+    Route::post('/{booking}/reject', [HostReservationController::class, 'reject'])->whereNumber('booking');
+    Route::post('/{booking}/cancel', [HostReservationController::class, 'cancel'])->whereNumber('booking');
 });
-
