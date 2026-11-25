@@ -24,6 +24,8 @@ erDiagram
     properties ||--o{ reviews : ""
     properties ||--o{ favorites : ""
     properties ||--o{ conversations : ""
+    users ||--o{ experiences : "hosts (host_id)"
+    users ||--o{ services : "hosts (host_id)"
 
     bookings ||--o| reviews : "one review max"
     bookings ||--o{ payments : ""
@@ -59,6 +61,37 @@ erDiagram
         smallint bedrooms
         smallint beds
         decimal bathrooms "e.g. 1.5"
+        bool pets_allowed "default false"
+        enum status "draft | published | inactive"
+        timestamp deleted_at "soft delete"
+    }
+    experiences {
+        bigint id PK
+        bigint host_id FK
+        string title
+        text description
+        string category "App\Enums\ExperienceCategory"
+        string country
+        string city
+        decimal price "per guest, > 0"
+        smallint duration_minutes "> 0"
+        smallint max_guests "> 0"
+        string image_url "nullable"
+        enum status "draft | published | inactive"
+        timestamp deleted_at "soft delete"
+    }
+    services {
+        bigint id PK
+        bigint host_id FK
+        string title
+        text description
+        string category "App\Enums\ServiceCategory"
+        string country
+        string city
+        decimal price "per guest, > 0"
+        smallint duration_minutes "> 0"
+        smallint max_guests "> 0"
+        string image_url "nullable"
         enum status "draft | published | inactive"
         timestamp deleted_at "soft delete"
     }
@@ -199,6 +232,9 @@ Some IDs are copied on purpose so common queries need no join. The code creating
 ### Enums
 Allowed values live in `backend/app/Enums` and are cast on the models (`$booking->status === BookingStatus::Confirmed`). Validate requests with `Rule::enum(PropertyType::class)`. `property_type` is a string column so a new type only needs a new enum case; the other enums are MySQL `ENUM` columns and need a migration to add values.
 
+### Homepage tabs
+**Homes** = properties of every `property_type` except `hotel`, **Hotels** = `property_type = 'hotel'` (both bookable by night). **Experiences** and **Services** are their own tables: priced per guest for one session of `duration_minutes`, read-only for now (no booking). Demo data: `php artisan db:seed --class=HotelExperienceServiceSeeder` (safe on an existing database; also part of `--seed`).
+
 ### Security
 `users.role` is **not** mass-assignable, so a registration request can't send `role=admin`. Set it explicitly: `$user->role = UserRole::Host; $user->save();`.
 
@@ -220,6 +256,7 @@ Enforced by MySQL even if validation is forgotten (see `backend/tests/Feature/Da
 | Table | Rule |
 |---|---|
 | properties | `price_per_night > 0`, `max_guests > 0`, `bathrooms >= 0`, valid latitude/longitude |
+| experiences, services | `price > 0`, `duration_minutes > 0`, `max_guests > 0` |
 | bookings | `check_out > check_in`, `guests > 0`, prices `>= 0` |
 | property_blocked_dates | `end_date > start_date` |
 | reviews | `rating BETWEEN 1 AND 5`, one review per booking |

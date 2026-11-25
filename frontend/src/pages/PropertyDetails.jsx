@@ -1,12 +1,15 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'react-router';
 import api from '../lib/api.js';
+import { useI18n } from '../i18n/I18nContext.jsx';
+import { amenityLabel, countLabel, formatRating } from '../lib/listing.js';
 
 import BookingCard from '../components/booking/BookingCard.jsx';
 
 const LOCAL_PHOTOS = ['/1.jpg', '/2.jpg', '/3.jpg', '/4.jpg', '/5.jpg'];
 
 export default function PropertyDetails() {
+  const { t, locale } = useI18n();
   const { id } = useParams();
   const [property, setProperty] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -19,8 +22,8 @@ export default function PropertyDetails() {
       .finally(() => setLoading(false));
   }, [id]);
 
-  if (loading) return <div className="py-16 text-center text-sm text-[#6A6A6A]">Loading...</div>;
-  if (!property) return <div className="py-16 text-center text-sm text-red-500">Nothing was found</div>;
+  if (loading) return <div className="py-16 text-center text-sm text-[#6A6A6A]">{t('common.loading')}</div>;
+  if (!property) return <div className="py-16 text-center text-sm text-red-500">{t('listing.notFound')}</div>;
 
   // Формируем 5 фото для фирменного коллажа Airbnb -> recheck this please
   const photos = Array.from({ length: 5 }, (_, idx) => {
@@ -35,7 +38,7 @@ export default function PropertyDetails() {
       <div className="mt-4">
         <h1 className="text-[26px] font-semibold leading-tight">{property.title}</h1>
         <div className="mt-2 flex flex-wrap items-center gap-2 text-sm">
-          <span className="font-semibold">★ 4,95</span>
+          <span className="font-semibold">★ {formatRating(locale)}</span>
           <span>·</span>
           <span className="font-semibold underline">
             {property.city}, {property.country}
@@ -73,10 +76,15 @@ export default function PropertyDetails() {
           <div className="flex items-center justify-between border-b border-gray-200 pb-6">
             <div>
               <h2 className="text-[22px] font-semibold">
-                Жилье целиком · Хозяин: {property.host?.name || 'Alex'}
+                {t('listing.hostedBy', { name: property.host?.name || 'Alex' })}
               </h2>
               <p className="mt-1 text-base text-[#222222]">
-                {property.max_guests} гостей · {property.bedrooms} спален · {property.beds} кроватей · {property.bathrooms} ванных
+                {[
+                  countLabel(t, locale, 'listing.guests', property.max_guests),
+                  countLabel(t, locale, 'listing.bedrooms', property.bedrooms),
+                  countLabel(t, locale, 'listing.beds', property.beds),
+                  countLabel(t, locale, 'listing.bathrooms', property.bathrooms),
+                ].join(' · ')}
               </p>
             </div>
             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[#222222] text-lg font-semibold text-white">
@@ -94,12 +102,12 @@ export default function PropertyDetails() {
           {/* Удобства */}
           {property.amenities?.length > 0 && (
             <div className="py-6">
-              <h3 className="mb-4 text-[22px] font-semibold">Какие удобства вас ждут</h3>
+              <h3 className="mb-4 text-[22px] font-semibold">{t('listing.amenitiesTitle')}</h3>
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 {property.amenities.map((amenity) => (
                   <div key={amenity.id} className="flex items-center gap-3 text-base">
                     <span className="text-lg">✓</span>
-                    <span>{amenity.name}</span>
+                    <span>{amenityLabel(t, amenity)}</span>
                   </div>
                 ))}
               </div>

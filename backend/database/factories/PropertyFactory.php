@@ -13,8 +13,8 @@ use Illuminate\Database\Eloquent\Factories\Factory;
  */
 class PropertyFactory extends Factory
 {
-    /** [country, city, latitude, longitude] — coordinates are jittered around the city centre. */
-    private const CITIES = [
+    /** [country, city, latitude, longitude] — coordinates are jittered around the city centre. Also used by the experience/service factories. */
+    public const CITIES = [
         ['Romania', 'Bucharest', 44.4268, 26.1025],
         ['Romania', 'Cluj-Napoca', 46.7712, 23.6236],
         ['Romania', 'Brasov', 45.6427, 25.5887],
@@ -31,7 +31,8 @@ class PropertyFactory extends Factory
     public function definition(): array
     {
         [$country, $city, $lat, $lng] = fake()->randomElement(self::CITIES);
-        $type = fake()->randomElement(PropertyType::cases());
+        // Homes only; hotels come from the hotel() state
+        $type = fake()->randomElement(array_values(array_filter(PropertyType::cases(), fn (PropertyType $type) => $type !== PropertyType::Hotel)));
         $bedrooms = $type === PropertyType::Studio || $type === PropertyType::Room ? 1 : fake()->numberBetween(1, 4);
 
         return [
@@ -50,6 +51,7 @@ class PropertyFactory extends Factory
             'bedrooms' => $bedrooms,
             'beds' => $bedrooms + fake()->numberBetween(0, 1),
             'bathrooms' => fake()->randomElement([1, 1, 1.5, 2, 2.5]),
+            'pets_allowed' => fake()->boolean(40),
             'status' => PropertyStatus::Published,
         ];
     }
@@ -62,5 +64,21 @@ class PropertyFactory extends Factory
     public function inactive(): static
     {
         return $this->state(fn () => ['status' => PropertyStatus::Inactive]);
+    }
+
+    /** A hotel room: "Grand hotel in Rome", 2 guests. */
+    public function hotel(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'property_type' => PropertyType::Hotel,
+            'title' => fake()->randomElement(['Grand', 'Boutique', 'Central', 'Riverside', 'Old Town', 'Park'])
+                .' hotel in '.$attributes['city'],
+            'price_per_night' => fake()->numberBetween(60, 250),
+            'max_guests' => 2,
+            'bedrooms' => 1,
+            'beds' => fake()->numberBetween(1, 2),
+            'bathrooms' => 1,
+            'pets_allowed' => false,
+        ]);
     }
 }

@@ -25,6 +25,7 @@ use Illuminate\Support\Collection;
  *   admin@example.com  - admin
  *   host@example.com   - host with 4 published listings + 1 draft
  *   guest@example.com  - guest with a past stay, an upcoming stay and a conversation
+ * Plus 6 hotels, 12 experiences and 10 services spread over the hosts (HotelExperienceServiceSeeder).
  */
 class DatabaseSeeder extends Seeder
 {
@@ -69,6 +70,9 @@ class DatabaseSeeder extends Seeder
         }
 
         $this->seedConversations($published, $guests, $demoGuest);
+
+        // Homepage tabs Hotels / Experiences / Services
+        $this->call(HotelExperienceServiceSeeder::class);
     }
 
     private function seedImages(Property $property): void
