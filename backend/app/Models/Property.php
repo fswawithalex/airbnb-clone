@@ -22,7 +22,7 @@ use Illuminate\Support\Carbon;
 // host_id is not fillable: create listings through the relation, e.g. $user->properties()->create($data)
 #[Fillable([
     'title', 'description', 'property_type', 'country', 'city', 'address', 'latitude', 'longitude',
-    'price_per_night', 'max_guests', 'bedrooms', 'beds', 'bathrooms', 'status',
+    'price_per_night', 'max_guests', 'bedrooms', 'beds', 'bathrooms', 'pets_allowed', 'status',
 ])]
 class Property extends Model
 {
@@ -48,6 +48,7 @@ class Property extends Model
             'max_guests' => 'integer',
             'bedrooms' => 'integer',
             'beds' => 'integer',
+            'pets_allowed' => 'boolean',
         ];
     }
 

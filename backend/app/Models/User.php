@@ -97,6 +97,16 @@ class User extends Authenticatable
         return $this->hasMany(Property::class, 'host_id');
     }
 
+    public function experiences(): HasMany
+    {
+        return $this->hasMany(Experience::class, 'host_id');
+    }
+
+    public function services(): HasMany
+    {
+        return $this->hasMany(Service::class, 'host_id');
+    }
+
     /** Stays this user booked as a guest. */
     public function bookings(): HasMany
     {

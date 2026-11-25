@@ -1,12 +1,16 @@
 <?php
 
 use App\Http\Controllers\Api\Admin\UserController as AdminUserController;
+use App\Http\Controllers\Api\AmenityController;
 use App\Http\Controllers\Api\Auth\AuthController;
 use App\Http\Controllers\Api\Auth\PasswordResetController;
 use App\Http\Controllers\Api\BookingController;
+use App\Http\Controllers\Api\DestinationController;
+use App\Http\Controllers\Api\ExperienceController;
 use App\Http\Controllers\Api\HostReservationController;
 use App\Http\Controllers\Api\ProfileController;
 use App\Http\Controllers\Api\PropertyController;
+use App\Http\Controllers\Api\ServiceController;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
 
@@ -63,6 +67,12 @@ Route::middleware(['auth:sanctum', 'role:admin'])->prefix('admin/users')->group(
     Route::post('/{user}/restore', [AdminUserController::class, 'restore'])->withTrashed();
 });
 
+Route::get('/amenities', [AmenityController::class, 'index']);
+Route::get('/destinations', [DestinationController::class, 'index']);
+Route::get('/experiences', [ExperienceController::class, 'index']);
+Route::get('/experiences/{experience}', [ExperienceController::class, 'show'])->whereNumber('experience');
+Route::get('/services', [ServiceController::class, 'index']);
+Route::get('/services/{service}', [ServiceController::class, 'show'])->whereNumber('service');
 Route::get('/properties', [PropertyController::class, 'index']);
 Route::get('/properties/{property}', [PropertyController::class, 'show'])->whereNumber('property');
 Route::get('/properties/{property}/availability', [BookingController::class, 'availability'])->whereNumber('property');

@@ -8,6 +8,7 @@ import Layout from './components/Layout.jsx'
 import ProtectedRoute, { GuestOnlyRoute } from './components/ProtectedRoute.jsx'
 import Home from './pages/Home.jsx'
 import PropertyDetails from './pages/PropertyDetails.jsx'
+import OfferingDetails from './pages/OfferingDetails.jsx'
 import NotFound from './pages/NotFound.jsx'
 import AuthRoute from './pages/auth/AuthRoute.jsx'
 import ResetPassword from './pages/auth/ResetPassword.jsx'
@@ -30,6 +31,8 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <Home /> },
       { path: 'properties/:id', element: <PropertyDetails /> },
+      { path: 'experiences/:id', element: <OfferingDetails kind="experiences" /> },
+      { path: 'services/:id', element: <OfferingDetails kind="services" /> },
       { path: 'users/:id', element: <PublicProfile /> },
       { path: 'users/show/:id', element: <PublicProfile /> },
       { path: 'become-a-host', element: <BecomeHost /> },

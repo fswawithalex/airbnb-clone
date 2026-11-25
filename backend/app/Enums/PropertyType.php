@@ -15,6 +15,8 @@ enum PropertyType: string
     case Cottage = 'cottage';
     case Studio = 'studio';
     case Room = 'room';
+    // "Hotels" tab on the homepage; every other type is a "Home"
+    case Hotel = 'hotel';
 
     public function label(): string
     {
