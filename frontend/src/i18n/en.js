@@ -36,7 +36,7 @@ export default {
   'lang.choose': 'Choose a language and region',
 
   'auth.title': 'Log in or sign up',
-  'auth.welcome': 'Welcome to airbnb clone',
+  'auth.welcome': 'Welcome to Stayora',
   'auth.email': 'Email',
   'auth.continue': 'Continue',
   'auth.loginTitle': 'Log in',
@@ -50,7 +50,7 @@ export default {
   'auth.lastName': 'Last name on ID',
   'auth.nameHint': 'Make sure this matches the name on your government ID.',
   'auth.birthdate': 'Birthdate',
-  'auth.birthdateHint': "To sign up, you need to be at least 18. Your birthday won't be shared with other people who use airbnb clone.",
+  'auth.birthdateHint': "To sign up, you need to be at least 18. Your birthday won't be shared with other people who use Stayora.",
   'auth.contactInfo': 'Contact info',
   'auth.emailHint': "We'll email you trip confirmations and receipts.",
   'auth.passwordHint': 'At least 8 characters, with letters and numbers.',
@@ -121,8 +121,8 @@ export default {
 
   'profile.reviews': 'Reviews',
   'profile.listings': 'Listings',
-  'profile.yearsOn': 'Years on airbnb clone',
-  'profile.monthsOn': 'Months on airbnb clone',
+  'profile.yearsOn': 'Years on Stayora',
+  'profile.monthsOn': 'Months on Stayora',
   'profile.about': 'About {name}',
   'profile.joined': 'Joined in {date}',
   'profile.confirmed': '{name}’s confirmed information',

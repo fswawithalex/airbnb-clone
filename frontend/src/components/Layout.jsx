@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { FaAirbnb } from 'react-icons/fa'
+import { FaCompass } from 'react-icons/fa'
 import { Link, Outlet, useLocation, useSearchParams } from 'react-router'
 import { OFFERING_CATEGORIES, hasSearch, readSearch } from '../lib/search.js'
 import { useAuth } from '../context/AuthContext.jsx'
@@ -112,9 +112,9 @@ export default function Layout() {
             <div
               className={`h-20 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-4 ${collapsed ? '' : 'xl:h-24'} ${isHome ? 'hidden sm:grid' : 'grid'}`}
             >
-              <Link to="/" className="flex shrink-0 items-center gap-1.5 text-brand" aria-label="airbnb-clone">
-                <FaAirbnb aria-hidden="true" className="h-8 w-8" />
-                <span className={`${wordmark} whitespace-nowrap text-[22px] font-bold tracking-tight`}>airbnb-clone</span>
+              <Link to="/" className="flex shrink-0 items-center gap-1.5 text-brand" aria-label="Stayora">
+                <FaCompass aria-hidden="true" className="h-8 w-8" />
+                <span className={`${wordmark} whitespace-nowrap text-[22px] font-bold tracking-tight`}>stayora</span>
               </Link>
 
               {/* The middle takes the room left between logo and buttons, so the logo never wraps */}

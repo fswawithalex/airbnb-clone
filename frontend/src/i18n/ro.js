@@ -36,7 +36,7 @@ export default {
   'lang.choose': 'Alege o limbă și o regiune',
 
   'auth.title': 'Conectează-te sau înscrie-te',
-  'auth.welcome': 'Bine ai venit pe airbnb clone',
+  'auth.welcome': 'Bine ai venit pe Stayora',
   'auth.email': 'Email',
   'auth.continue': 'Continuă',
   'auth.loginTitle': 'Conectează-te',
@@ -50,7 +50,7 @@ export default {
   'auth.lastName': 'Numele din actul de identitate',
   'auth.nameHint': 'Asigură-te că se potrivește cu numele din actul tău de identitate.',
   'auth.birthdate': 'Data nașterii',
-  'auth.birthdateHint': 'Ca să te înscrii, trebuie să ai cel puțin 18 ani. Data nașterii nu va fi arătată altor utilizatori airbnb clone.',
+  'auth.birthdateHint': 'Ca să te înscrii, trebuie să ai cel puțin 18 ani. Data nașterii nu va fi arătată altor utilizatori Stayora.',
   'auth.contactInfo': 'Date de contact',
   'auth.emailHint': 'Îți vom trimite pe email confirmările rezervărilor și chitanțele.',
   'auth.passwordHint': 'Cel puțin 8 caractere, cu litere și cifre.',
@@ -121,8 +121,8 @@ export default {
 
   'profile.reviews': 'Recenzii',
   'profile.listings': 'Anunțuri',
-  'profile.yearsOn': 'Ani pe airbnb clone',
-  'profile.monthsOn': 'Luni pe airbnb clone',
+  'profile.yearsOn': 'Ani pe Stayora',
+  'profile.monthsOn': 'Luni pe Stayora',
   'profile.about': 'Despre {name}',
   'profile.joined': 'S-a înscris în {date}',
   'profile.confirmed': 'Informațiile confirmate ale lui {name}',

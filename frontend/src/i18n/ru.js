@@ -36,7 +36,7 @@ export default {
   'lang.choose': 'Выберите язык и регион',
 
   'auth.title': 'Вход или регистрация',
-  'auth.welcome': 'Добро пожаловать в airbnb clone',
+  'auth.welcome': 'Добро пожаловать в Stayora',
   'auth.email': 'Email',
   'auth.continue': 'Продолжить',
   'auth.loginTitle': 'Вход',
@@ -50,7 +50,7 @@ export default {
   'auth.lastName': 'Фамилия как в документе',
   'auth.nameHint': 'Убедитесь, что имя совпадает с указанным в удостоверении личности.',
   'auth.birthdate': 'Дата рождения',
-  'auth.birthdateHint': 'Для регистрации вам должно быть не меньше 18 лет. Дата рождения не будет видна другим пользователям airbnb clone.',
+  'auth.birthdateHint': 'Для регистрации вам должно быть не меньше 18 лет. Дата рождения не будет видна другим пользователям Stayora.',
   'auth.contactInfo': 'Контактная информация',
   'auth.emailHint': 'Мы будем присылать подтверждения поездок и квитанции на этот email.',
   'auth.passwordHint': 'Не менее 8 символов, буквы и цифры.',
@@ -121,8 +121,8 @@ export default {
 
   'profile.reviews': 'Отзывы',
   'profile.listings': 'Объявления',
-  'profile.yearsOn': 'Лет на airbnb clone',
-  'profile.monthsOn': 'Месяцев на airbnb clone',
+  'profile.yearsOn': 'Лет на Stayora',
+  'profile.monthsOn': 'Месяцев на Stayora',
   'profile.about': 'О пользователе {name}',
   'profile.joined': 'Дата регистрации: {date}',
   'profile.confirmed': 'Подтверждённые данные: {name}',

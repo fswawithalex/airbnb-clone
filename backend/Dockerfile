@@ -13,11 +13,12 @@ RUN cp "$PHP_INI_DIR/php.ini-production" "$PHP_INI_DIR/php.ini"
 WORKDIR /var/www/html
 
 COPY composer.json composer.lock ./
-RUN composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+RUN composer install --no-dev --no-scripts --optimize-autoloader --no-interaction --prefer-dist
 
 COPY . .
 
-RUN php artisan storage:link || true
+RUN composer dump-autoload --optimize --no-interaction \
+    && php artisan storage:link || true
 
 ENV PHP_CLI_SERVER_WORKERS=4
 
