@@ -15,6 +15,9 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        // Return 401 JSON instead of redirecting to a non-existent 'login' route on API calls
+        $middleware->redirectGuestsTo(fn (Request $request) => $request->is('api/*') ? null : '/login');
+
         // Usage: ->middleware('role:admin') or ->middleware('role:host,admin')
         // Accept-Language: en | ro | ru -> translated validation messages and emails
         $middleware->api(append: [SetLocaleFromRequest::class]);
